@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose'); // Import mongoose
 const router = express.Router();
 const User = require('../Model/User');
+const bcrypt = require('bcrypt');
 // Route to get all users
 router.get('/', async (req, res) => {
     try {
@@ -55,8 +56,9 @@ router.get('/', async (req, res) => {
         return res.status(404).json({ error: 'User not found' });
       }
   
-      // Compare the plain-text password
-      if (user.password !== password) {
+      // Compare the plain-text password with the hashed password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
   
