@@ -67,8 +67,7 @@ router.get('/', async (req, res) => {
     }
   });
   
-
-  router.put('/updateUser/:id', async (req, res) => {
+  router.put('/userPassUpdate/:id', async (req, res) => {
     try {
         const { id } = req.params; // Extract the id from request params
         const { email, password } = req.body;
@@ -82,6 +81,33 @@ router.get('/', async (req, res) => {
         const user = await User.findByIdAndUpdate(
             id,                     // The id from request params
             { email, password },     // Updated fields
+            { new: true, runValidators: true } // Return the updated user, apply validation
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+  router.put('/updateUser/:id', async (req, res) => {
+    try {
+        const { id } = req.params; // Extract the id from request params
+        const { name,email } = req.body;
+
+        // Check if the ID is a valid ObjectId
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid User ID' });
+        }
+
+        // Find and update the user by id
+        const user = await User.findByIdAndUpdate(
+            id,                     // The id from request params
+            {name, email },     // Updated fields
             { new: true, runValidators: true } // Return the updated user, apply validation
         );
 
