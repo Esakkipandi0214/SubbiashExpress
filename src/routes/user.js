@@ -3,6 +3,7 @@ const mongoose = require('mongoose'); // Import mongoose
 const router = express.Router();
 const User = require('../Model/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 // Route to get all users
 router.get('/', async (req, res) => {
     try {
@@ -40,7 +41,21 @@ router.get('/', async (req, res) => {
       const { name, email, password } = req.body;
       const user = new User({ name, email, password });
       await user.save();
-      res.status(201).json(user);
+       const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    res.status(201).json({
+      message: 'User registered',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email
+      },
+      token
+    });
     } catch (err) {
       res.status(400).json({ error: err.message });
     }
@@ -61,9 +76,21 @@ router.get('/', async (req, res) => {
       if (!isMatch) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
-  
-      // Login successful
-      res.status(200).json({ message: 'Login successful', user });
+  const token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email
+      },
+      token
+    });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const actionsRouter = require('./routes/actions');
 const actionsRouterUser = require('./routes/user');
+const todoRoutes = require('./routes/todoRoutes');
 const cors = require('cors');
 
 const connectDB = require('./DBConfig/db');
@@ -16,7 +17,7 @@ app.use(express.json()); // Parse JSON bodies
 // Routes
 app.use('/api/actions', actionsRouter);
 app.use('/api/userActions', actionsRouterUser);
-
+app.use('/api/todos', todoRoutes);
 
 // Default route
 app.get('/', (req, res) => {
