@@ -11,7 +11,10 @@ require('dotenv').config();
 connectDB();
 
 // Middleware
-app.use(cors()); // Enable CORS with default options
+app.use(cors({
+  origin: ['https://agenda-verse-build.vercel.app',"http://localhost:8080"], // Replace with your real frontend domain
+  credentials: true
+}));// Enable CORS with default options
 app.use(express.json()); // Parse JSON bodies
 
 // Routes
