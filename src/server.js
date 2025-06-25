@@ -15,6 +15,7 @@ const cors = require('cors');
 const actionsRouter = require('./routes/actions');
 const actionsRouterUser = require('./routes/user');
 const todoRoutes = require('./routes/todoRoutes');
+const authRoutes = require('./routes/auth');
 
 // Middleware
 app.use(cors({
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use('/api/actions', actionsRouter);
 app.use('/api/userActions', actionsRouterUser);
 app.use('/api/todos', todoRoutes);
+app.use("/auth", authRoutes);
 
 // Root Route
 app.get('/', (req, res) => {
