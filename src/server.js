@@ -6,15 +6,15 @@
 const express = require('express');
 require('dotenv').config();
 
-const connectDB = require('./src/DBConfig/db');
+const connectDB = require('./DBConfig/db');
 connectDB();
 
 const app = express();
 const cors = require('cors');
 
-const actionsRouter = require('./src/routes/actions');
-const actionsRouterUser = require('./src/routes/user');
-const todoRoutes = require('./src/routes/todoRoutes');
+const actionsRouter = require('./routes/actions');
+const actionsRouterUser = require('./routes/user');
+const todoRoutes = require('./routes/todoRoutes');
 
 // Middleware
 app.use(cors({
