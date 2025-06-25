@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose'); // Import mongoose
 const router = express.Router();
 const User = require('../Model/User');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 // Route to get all users
 router.get('/', async (req, res) => {
