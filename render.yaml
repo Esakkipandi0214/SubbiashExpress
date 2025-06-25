@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: sample-express-server
+    env: node
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: node src/server.js
+    rootDir: .
+    autoDeploy: true
