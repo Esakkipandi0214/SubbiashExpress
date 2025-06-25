@@ -78,57 +78,6 @@ res.redirect(redirectUrl);
   }
 });
 
-router.get("/google/callback", async (req, res) => {
-  const code = req.query.code;
-
-  try {
-    // 1. Exchange code for tokens
-    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      code,
-      redirect_uri: 'http://localhost:3000/auth/google/callback',
-      grant_type: 'authorization_code'
-    });
-
-    const { access_token, id_token } = tokenRes.data;
-
-    // 2. Decode user info from id_token
-    const userRes = await axios.get(
-      `https://www.googleapis.com/oauth2/v3/userinfo`,
-      {
-        headers: { Authorization: `Bearer ${access_token}` },
-      }
-    );
-
-    const googleUser = userRes.data;
-
-    // 3. Find or create user in DB
-    let user = await User.findOne({ googleId: googleUser.sub });
-
-    if (!user) {
-      user = await User.create({
-        name: googleUser.name,
-        email: googleUser.email,
-        googleId: googleUser.sub,
-      });
-    }
-
-    // 4. Generate JWT token
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-
-    // 5. Redirect or respond
-    res.redirect(`${process.env.FRONTENDURL}/github-success?token=${token}`);
-
-  } catch (err) {
-    console.error("Google OAuth error:", err.message);
-    res.status(500).json({ error: "Google login failed" });
-  }
-});
 
 router.get("/google/callback", async (req, res) => {
   const code = req.query.code;
@@ -139,7 +88,7 @@ router.get("/google/callback", async (req, res) => {
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET,
       code,
-      redirect_uri: 'http://localhost:3000/auth/google/callback',
+      redirect_uri: 'https://subbiashexpress.onrender.com/auth/google/callback',
       grant_type: 'authorization_code'
     });
 
