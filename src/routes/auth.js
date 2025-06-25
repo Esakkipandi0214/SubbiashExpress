@@ -7,8 +7,8 @@ const router = express.Router();
 
 router.get("/github/callback", async (req, res) => {
   const code = req.query.code;
-  const clientId = "Ov23licq6RJwZGiYK9jL";
-  const clientSecret = "b6585575a24bd16d2eb700127aff6eaca34502fd";
+  const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
   try {
     // Step 1: Exchange code for access token
