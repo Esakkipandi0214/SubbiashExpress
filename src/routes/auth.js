@@ -74,7 +74,8 @@ res.redirect(redirectUrl);
 
   } catch (err) {
     console.error("GitHub OAuth error:", err.response?.data || err.message);
-    res.status(500).json({ error: "GitHub login failed" });
+    res.redirect(`${process.env.FRONTENDURL}/github-error?provider=github&reason=login_failed`);
+    // res.status(500).json({ error: "GitHub login failed" });
   }
 });
 
@@ -128,7 +129,8 @@ router.get("/google/callback", async (req, res) => {
 
   } catch (err) {
     console.error("Google OAuth error:", err.message);
-    res.status(500).json({ error: "Google login failed" });
+      res.redirect(`${process.env.FRONTENDURL}/google-error?provider=github&reason=login_failed`);
+    // res.status(500).json({ error: "Google login failed" });
   }
 });
 

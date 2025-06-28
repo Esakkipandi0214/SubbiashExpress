@@ -4,11 +4,48 @@ const mongoose = require('mongoose');
 // Create
 exports.createTodo = async (req, res) => {
   try {
+
+    const { title, userId } = req.body;
+
+    // Step 1: Basic validation
+    if (!title || !userId) {
+      return res.status(400).json({
+        error: 'Missing required fields',
+        message: 'Title and user ID are required to create a todo.',
+      });
+    }
+    // Step 2: Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid userId format' });
+    }
     const todo = new Todo({ ...req.body });
     await todo.save();
     res.status(201).json(todo);
   } catch (err) {
-    res.status(400).json({ error: 'Error creating todo', details: err });
+    // Step 4: Handle validation errors from Mongoose
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({
+        error: 'Validation failed',
+        message: errors[0] || 'Invalid input data',
+        details: errors,
+      });
+    }
+
+    // Step 5: Duplicate key (if you add any unique fields later)
+    if (err.code === 11000) {
+      return res.status(409).json({
+        error: 'Duplicate entry',
+        message: 'This todo already exists.',
+      });
+    }
+
+    // Step 6: Generic fallback
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Something went wrong while creating the todo.',
+    });
+    // res.status(400).json({ error: 'Error creating todo', details: err });
   }
 };
 
