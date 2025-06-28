@@ -91,11 +91,19 @@ router.get('/', async (req, res) => {
   router.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required.' });
+      }
   
       // Find the user by email
       const user = await User.findOne({ email });
       if (!user) {
         return res.status(404).json({ error: 'We couldn’t find your account. Please double-check your email and try again.' });
+      }
+
+       if (!user.password) {
+        return res.status(401).json({ error: 'This account was created using a social login. Please use the respective social login to access your account.' });
       }
   
       // Compare the plain-text password with the hashed password
