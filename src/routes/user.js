@@ -39,6 +39,29 @@ router.get('/', async (req, res) => {
   router.post('/', async (req, res) => {
     try {
       const { name, email, password } = req.body;
+
+       // Basic validation
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+     // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ error: 'This email is already registered. Please login.' });
+    }
+
+    // Optional: Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+
+    // Optional: Enforce password strength
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+    }
+
       const user = new User({ name, email, password });
       await user.save();
        const token = jwt.sign(
@@ -56,25 +79,37 @@ router.get('/', async (req, res) => {
       },
       token
     });
-    } catch (err) {
-      res.status(400).json({ error: err.message });
+    } catch (err) { 
+      // Generic fallback
+    res.status(500).json({
+      error: 'Something went wrong. Please try again later.'
+    });
+      // res.status(400).json({ error: err.message });
     }
   });
 
   router.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required.' });
+      }
   
       // Find the user by email
       const user = await User.findOne({ email });
       if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'We couldn’t find your account. Please double-check your email and try again.' });
+      }
+
+       if (!user.password) {
+        return res.status(401).json({ error: 'This account was created using a social login. Please use the respective social login to access your account.' });
       }
   
       // Compare the plain-text password with the hashed password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Your email or password didn’t match. Please try again.' });
       }
   const token = jwt.sign(
       { userId: user._id, email: user.email },
